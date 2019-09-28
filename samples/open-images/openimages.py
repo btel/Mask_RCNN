@@ -62,8 +62,7 @@ class OpenImageDataset(Dataset):
                 row = fid.readline()
                 while row: 
                     mask_path, image_id, label, box_id, xmin, xmax, ymin, ymax, _, _ = row.split(',')
-                    if image_id.startswith('0'): # for testing
-                        self._annotations[image_id].append(
+                    self._annotations[image_id].append(
                             {'label': label, 
                              'mask_path': mask_path,
                              'bounding_box': (xmin, xmax, ymin, ymax)})
@@ -99,7 +98,7 @@ class OpenImageDataset(Dataset):
             masks.append(mask_image)
             classes.append(self.map_source_class_id('openimages.'+mask['label']))
         if not masks:
-            return np.array([[]]), np.array([])
+            return np.array([[[]]]), np.array([])
         masks = np.stack(masks, axis=2).astype(bool)
         return masks, np.array(classes)
         
