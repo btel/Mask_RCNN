@@ -12,6 +12,8 @@ from pycocotools import _mask as coco_mask
 import typing as t
 import zlib
 
+import os.path
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
 
@@ -72,12 +74,19 @@ class OpenImageDataset(Dataset):
             pass
                 
              
-        # load images
-        image_paths = glob.glob(os.path.join(path, subset, 'images', '*.jpg')) 
-        for image_path in image_paths:
-            _, filename = os.path.split(image_path)
-            image_id, _ = os.path.splitext(filename)
-            self.add_image('openimages', image_id, image_path)
+        # add image paths
+        for image_id in self._annotations.keys():
+            filename = image_id + ".jpg"
+            image_path = os.path.join(path, subset, 'images', filename)
+            if os.path.exists(image_path):
+                self.add_image('openimages', image_id, image_path)
+        
+        if not self._annotations:
+            image_paths = glob.glob(os.path.join(path, subset, 'images', '*.jpg')) 
+            for image_path in image_paths:
+                _, filename = os.path.split(image_path)
+                image_id, _ = os.path.splitext(filename)
+                self.add_image('openimages', image_id, image_path)
                 
     def load_image(self, image_id):
         image = super().load_image(image_id)
